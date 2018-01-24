@@ -7,6 +7,7 @@
 //
 
 #import "StillAndVideoViewController.h"
+#import "LTSAssetManager.h"
 
 static NSInteger toolBarHeight = 60;
 
@@ -70,22 +71,36 @@ static NSInteger toolBarHeight = 60;
     
     //start session
     [tempSession startRunning];
+    
 }
 
 #pragma mark - event methods
 
 - (IBAction)takePhoto:(id)sender {
-    
     if (![_imageOutput isCapturingStillImage]) {
         AVCaptureConnection *connection = [_imageOutput connectionWithMediaType:AVMediaTypeVideo];
         
         [_imageOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef  _Nullable imageDataSampleBuffer, NSError * _Nullable error) {
-            
+            if (error == nil) {
+                NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+                if (imageData) {
+                    UIImage *image = [UIImage imageWithData:imageData];
+                    [LTSAsset saveImage:image toAlbum:@"我的" completeHandler:^(BOOL reslut) {
+                        if (reslut) {
+                            NSLog(@"save image success.");
+                        }else{
+                            NSLog(@"save image fail.");
+                        }
+                    }];
+                }else{
+                    NSLog(@"the image data is nil");
+                }
+            }
         }];
     }
-    
-    
 }
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

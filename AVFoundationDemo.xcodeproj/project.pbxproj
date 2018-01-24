@@ -14,6 +14,7 @@
 		AD0EC88020171DBD00632129 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0EC87F20171DBD00632129 /* main.m */; };
 		AD0EC88820171E2900632129 /* MainTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0EC88720171E2900632129 /* MainTableViewController.m */; };
 		AD0EC88C201720C000632129 /* StillAndVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0EC88B201720C000632129 /* StillAndVideoViewController.m */; };
+		ADF6F3D62018265D004BE2ED /* LTSAssetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ADF6F3D52018265D004BE2ED /* LTSAssetManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,8 @@
 		AD0EC88A201720C000632129 /* StillAndVideoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StillAndVideoViewController.h; sourceTree = "<group>"; };
 		AD0EC88B201720C000632129 /* StillAndVideoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StillAndVideoViewController.m; sourceTree = "<group>"; };
 		AD0EC88E2017221700632129 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		ADF6F3D42018265D004BE2ED /* LTSAssetManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LTSAssetManager.h; sourceTree = "<group>"; };
+		ADF6F3D52018265D004BE2ED /* LTSAssetManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LTSAssetManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +69,7 @@
 				AD0EC87120171DBD00632129 /* AppDelegate.m */,
 				AD0EC88620171E2800632129 /* MainTableViewController.h */,
 				AD0EC88720171E2900632129 /* MainTableViewController.m */,
+				ADF6F3D320181CD7004BE2ED /* AssetManager */,
 				AD0EC8892017201C00632129 /* still and video media capture */,
 				AD0EC87620171DBD00632129 /* Main.storyboard */,
 				AD0EC87920171DBD00632129 /* Assets.xcassets */,
@@ -84,6 +88,15 @@
 				AD0EC88B201720C000632129 /* StillAndVideoViewController.m */,
 			);
 			path = "still and video media capture";
+			sourceTree = "<group>";
+		};
+		ADF6F3D320181CD7004BE2ED /* AssetManager */ = {
+			isa = PBXGroup;
+			children = (
+				ADF6F3D42018265D004BE2ED /* LTSAssetManager.h */,
+				ADF6F3D52018265D004BE2ED /* LTSAssetManager.m */,
+			);
+			path = AssetManager;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -159,6 +172,7 @@
 			files = (
 				AD0EC88020171DBD00632129 /* main.m in Sources */,
 				AD0EC88C201720C000632129 /* StillAndVideoViewController.m in Sources */,
+				ADF6F3D62018265D004BE2ED /* LTSAssetManager.m in Sources */,
 				AD0EC87220171DBD00632129 /* AppDelegate.m in Sources */,
 				AD0EC88820171E2900632129 /* MainTableViewController.m in Sources */,
 			);
