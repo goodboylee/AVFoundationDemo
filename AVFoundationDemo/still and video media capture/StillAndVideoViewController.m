@@ -11,13 +11,21 @@
 
 static NSInteger toolBarHeight = 60;
 
-@interface StillAndVideoViewController ()
+@interface StillAndVideoViewController ()<AVCaptureVideoDataOutputSampleBufferDelegate, UIGestureRecognizerDelegate, AVCaptureFileOutputRecordingDelegate>
 
-@property (nonatomic, strong) AVCaptureDevice *device;
-@property (nonatomic, strong) AVCaptureDeviceInput *deviceInput;
+@property (nonatomic, strong) AVCaptureDevice *audioDevice;
+@property (nonatomic, strong) AVCaptureDevice *videoDevice;
+@property (nonatomic, strong) AVCaptureDeviceInput *videoInput;
+@property (nonatomic, strong) AVCaptureDeviceInput *audioInput;
 @property (nonatomic, strong) AVCaptureStillImageOutput *imageOutput;//deprecated after 10.0
+@property (nonatomic, strong) AVCaptureMovieFileOutput *videoOutput;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
 @property (nonatomic, strong) AVCaptureSession *captureSession;
+
+//gesture
+@property (strong, nonatomic) IBOutlet UITapGestureRecognizer *tapGesture;
+@property (strong, nonatomic) IBOutlet UILongPressGestureRecognizer *longPressGesture;
+
 
 @end
 
@@ -28,36 +36,61 @@ static NSInteger toolBarHeight = 60;
     
     self.navigationController.navigationBarHidden = YES;
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    [_tapGesture requireGestureRecognizerToFail:_longPressGesture];
+    
     [self configureCamera];
 }
 
 - (void)configureCamera{
-    //device
-    AVCaptureDevice *tempDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    _device = tempDevice;
+    //defaut video device
+    AVCaptureDevice *tempVideoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    _audioDevice = tempVideoDevice;
     
-    //device input
+    //default audio device
+    AVCaptureDevice *tempAudioDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
+    _videoDevice = tempAudioDevice;
+    
+    //video device input
     NSError *error;
-    AVCaptureDeviceInput *tempInput = [AVCaptureDeviceInput deviceInputWithDevice:tempDevice error:&error];
+    AVCaptureDeviceInput *tempVideoInput = [AVCaptureDeviceInput deviceInputWithDevice:tempVideoDevice error:&error];
     if (error) {
-        NSLog(@"init device input fail.");
+        NSLog(@"init video device input fail.");
         return;
     }
-    _deviceInput = tempInput;
+    _videoInput = tempVideoInput;
+    
+    //audio device input
+    AVCaptureDeviceInput *tempAudioInput = [AVCaptureDeviceInput deviceInputWithDevice:tempAudioDevice error:&error];
+    if (error) {
+        NSLog(@"init audio device input fail.");
+    }
+    _audioInput = tempAudioInput;
     
     //image output
     AVCaptureStillImageOutput *tempStillImageOutput = [[AVCaptureStillImageOutput alloc] init];
     _imageOutput =  tempStillImageOutput;
     
+    //video output
+    AVCaptureMovieFileOutput *tempVideoOutput = [[AVCaptureMovieFileOutput alloc] init];
+    _videoOutput = tempVideoOutput;
+    
     //session
     AVCaptureSession *tempSession = [[AVCaptureSession alloc] init];
-    tempSession.sessionPreset = AVCaptureSessionPresetPhoto;
-    if ([tempSession canAddInput:tempInput]) {
-        [tempSession addInput:tempInput];
+    if ([tempSession canAddInput:tempAudioInput]) {
+        [tempSession addInput:tempAudioInput];
+    }
+    
+    if ([tempSession canAddInput:tempVideoInput]) {
+        [tempSession addInput:tempVideoInput];
     }
     
     if ([tempSession canAddOutput:tempStillImageOutput]) {
         [tempSession addOutput:tempStillImageOutput];
+    }
+    
+    if ([tempSession canAddOutput:tempVideoOutput]) {
+        [tempSession addOutput:tempVideoOutput];
     }
     
     _captureSession = tempSession;
@@ -71,37 +104,94 @@ static NSInteger toolBarHeight = 60;
     
     //start session
     [tempSession startRunning];
-    
 }
 
 #pragma mark - event methods
 
-- (IBAction)takePhoto:(id)sender {
-    if (![_imageOutput isCapturingStillImage]) {
-        AVCaptureConnection *connection = [_imageOutput connectionWithMediaType:AVMediaTypeVideo];
+- (IBAction)takePicture:(UITapGestureRecognizer *)sender {
+    
+    if (sender.state == UIGestureRecognizerStateEnded) {
+        [_captureSession beginConfiguration];
+        _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+        [_captureSession commitConfiguration];
         
-        [_imageOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef  _Nullable imageDataSampleBuffer, NSError * _Nullable error) {
-            if (error == nil) {
-                NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-                if (imageData) {
-                    UIImage *image = [UIImage imageWithData:imageData];
-                    [LTSAsset saveImage:image toAlbum:@"我的" completeHandler:^(BOOL reslut) {
-                        if (reslut) {
-                            NSLog(@"save image success.");
-                        }else{
-                            NSLog(@"save image fail.");
-                        }
-                    }];
-                }else{
-                    NSLog(@"the image data is nil");
+        if (![_imageOutput isCapturingStillImage]) {
+            AVCaptureConnection *connection = [_imageOutput connectionWithMediaType:AVMediaTypeVideo];
+            
+            [_imageOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef  _Nullable imageDataSampleBuffer, NSError * _Nullable error) {
+                if (error == nil) {
+                    NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+                    if (imageData) {
+                        UIImage *image = [UIImage imageWithData:imageData];
+                        [LTSAsset saveImage:image toAlbum:@"我的" completeHandler:^(BOOL reslut) {
+                            if (reslut) {
+                                NSLog(@"save image success.");
+                            }else{
+                                NSLog(@"save image fail.");
+                            }
+                        }];
+                    }else{
+                        NSLog(@"the image data is nil");
+                    }
                 }
-            }
-        }];
+            }];
+        }
+        
+        
     }
+    
+}
+- (IBAction)takeVideo:(UILongPressGestureRecognizer *)sender {
+    
+    if (sender.state == UIGestureRecognizerStateBegan) {
+        [_captureSession beginConfiguration];
+        _captureSession.sessionPreset = AVCaptureSessionPreset640x480;
+        [_captureSession commitConfiguration];
+        
+        NSString *path = [self videoPath];
+        NSLog(@"video path : %@", path);
+        NSURL *videoURL = [NSURL fileURLWithPath:path];
+        
+        if ([_videoOutput isRecording]) {
+            [_videoOutput stopRecording];
+        }
+        [_videoOutput startRecordingToOutputFileURL:videoURL recordingDelegate:self];
+    }else if (sender.state == UIGestureRecognizerStateEnded){
+        [_videoOutput stopRecording];
+    }
+    
 }
 
 
+#pragma mark - *** delegates ***
+#pragma mark  AVCaptureFileOutputRecordingDelegate
+- (void)captureOutput:(AVCaptureFileOutput *)output didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray<AVCaptureConnection *> *)connections error:(nullable NSError *)error{
+    if (error) {
+        NSLog(@"record wrong, description: %@", error.localizedDescription);
+        [_videoOutput stopRecording];
+    }else{
+        NSLog(@"record successfully to %@", [outputFileURL absoluteString]);
+    }
+}
 
+- (void)captureOutput:(AVCaptureFileOutput *)output didStartRecordingToOutputFileAtURL:(NSURL *)fileURL fromConnections:(NSArray<AVCaptureConnection *> *)connections{
+    NSLog(@"start video record.");
+}
+
+
+- (NSString *)documentPath{
+    return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+}
+- (NSString *)videoPath{
+    NSString *directory = [[self documentPath] stringByAppendingPathComponent:@"video"];
+    BOOL result = [[NSFileManager defaultManager] fileExistsAtPath:directory];
+    if (!result) {
+        result = [[NSFileManager defaultManager] createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    NSString *fileName = [[NSUUID UUID].UUIDString stringByAppendingPathExtension:@"mp4"];
+    return [directory stringByAppendingPathComponent:fileName];
+//    return [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
