@@ -47,35 +47,59 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gRi-4v-gZn">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="F2M-dw-O1M">
                                 <rect key="frame" x="0.0" y="607" width="375" height="60"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="U2p-f2-W7e" userLabel="PicVideoView">
+                                        <rect key="frame" x="157" y="0.0" width="60" height="60"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <gestureRecognizers/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="60" id="0Yt-ft-D5W"/>
+                                        </constraints>
+                                        <connections>
+                                            <outletCollection property="gestureRecognizers" destination="oDi-Pj-3zg" appends="YES" id="m2k-fC-LyP"/>
+                                            <outletCollection property="gestureRecognizers" destination="rmw-gY-AFV" appends="YES" id="RFz-QG-nhI"/>
+                                        </connections>
+                                    </view>
+                                </subviews>
                                 <color key="backgroundColor" red="0.30257641000000002" green="1" blue="0.94717793429999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="60" id="2hN-39-6Vj"/>
+                                    <constraint firstItem="U2p-f2-W7e" firstAttribute="centerX" secondItem="F2M-dw-O1M" secondAttribute="centerX" id="5Wk-4V-HLr"/>
+                                    <constraint firstAttribute="height" constant="60" id="GXY-Lt-EWR"/>
+                                    <constraint firstAttribute="bottom" secondItem="U2p-f2-W7e" secondAttribute="bottom" id="XdO-v9-Zwt"/>
+                                    <constraint firstItem="U2p-f2-W7e" firstAttribute="top" secondItem="F2M-dw-O1M" secondAttribute="top" id="clJ-E5-zh4"/>
                                 </constraints>
-                                <items>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="nZJ-Ob-aTP"/>
-                                    <barButtonItem title="拍照" id="hif-56-dKe">
-                                        <connections>
-                                            <action selector="takePhoto:" destination="tp6-KH-90W" id="hLL-q9-Rk4"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="2M6-SP-zmk"/>
-                                </items>
-                            </toolbar>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="gRi-4v-gZn" firstAttribute="trailing" secondItem="oyr-E1-lIj" secondAttribute="trailing" id="jxC-W5-HCx"/>
-                            <constraint firstItem="gRi-4v-gZn" firstAttribute="leading" secondItem="oyr-E1-lIj" secondAttribute="leading" id="lDV-Ah-Qm2"/>
-                            <constraint firstItem="oyr-E1-lIj" firstAttribute="bottom" secondItem="gRi-4v-gZn" secondAttribute="bottom" id="zdU-Z4-Txu"/>
+                            <constraint firstItem="F2M-dw-O1M" firstAttribute="leading" secondItem="oyr-E1-lIj" secondAttribute="leading" id="BeU-nV-9dd"/>
+                            <constraint firstItem="oyr-E1-lIj" firstAttribute="trailing" secondItem="F2M-dw-O1M" secondAttribute="trailing" id="cQp-Rj-K5X"/>
+                            <constraint firstItem="oyr-E1-lIj" firstAttribute="bottom" secondItem="F2M-dw-O1M" secondAttribute="bottom" id="mkd-zA-1my"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="oyr-E1-lIj"/>
                     </view>
+                    <connections>
+                        <outlet property="longPressGesture" destination="rmw-gY-AFV" id="yuC-dG-7fR"/>
+                        <outlet property="tapGesture" destination="oDi-Pj-3zg" id="4hk-34-GuQ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LMD-YH-VlN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="oDi-Pj-3zg">
+                    <connections>
+                        <action selector="takePicture:" destination="tp6-KH-90W" id="tC9-AI-2LH"/>
+                        <outlet property="delegate" destination="tp6-KH-90W" id="icm-5i-ce8"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="rmw-gY-AFV">
+                    <connections>
+                        <action selector="takeVideo:" destination="tp6-KH-90W" id="YHf-de-7tf"/>
+                        <outlet property="delegate" destination="tp6-KH-90W" id="zbF-FV-1Hw"/>
+                    </connections>
+                </pongPressGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="1151" y="123"/>
+            <point key="canvasLocation" x="1149.5999999999999" y="122.78860569715144"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="GEi-Ix-hhS">
