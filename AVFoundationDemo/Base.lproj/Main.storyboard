@@ -52,7 +52,6 @@
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="U2p-f2-W7e" userLabel="PicVideoView">
                                         <rect key="frame" x="157" y="0.0" width="60" height="60"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="0Yt-ft-D5W"/>
@@ -82,6 +81,7 @@
                     </view>
                     <connections>
                         <outlet property="longPressGesture" destination="rmw-gY-AFV" id="yuC-dG-7fR"/>
+                        <outlet property="takePhotoVideoBtn" destination="U2p-f2-W7e" id="cZg-hx-34E"/>
                         <outlet property="tapGesture" destination="oDi-Pj-3zg" id="4hk-34-GuQ"/>
                     </connections>
                 </viewController>

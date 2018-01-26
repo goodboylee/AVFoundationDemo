@@ -7,16 +7,18 @@
 //
 
 #import "StillAndVideoViewController.h"
+
+//view
+#import "CameraPreview.h"
+
 #import "LTSAssetManager.h"
 
 static NSInteger toolBarHeight = 60;
 
 @interface StillAndVideoViewController ()<AVCaptureVideoDataOutputSampleBufferDelegate, UIGestureRecognizerDelegate, AVCaptureFileOutputRecordingDelegate>
 
-@property (nonatomic, strong) AVCaptureDevice *audioDevice;
-@property (nonatomic, strong) AVCaptureDevice *videoDevice;
-@property (nonatomic, strong) AVCaptureDeviceInput *videoInput;
-@property (nonatomic, strong) AVCaptureDeviceInput *audioInput;
+//session
+@property (nonatomic) dispatch_queue_t sessionQueue;
 @property (nonatomic, strong) AVCaptureStillImageOutput *imageOutput;//deprecated after 10.0
 @property (nonatomic, strong) AVCaptureMovieFileOutput *videoOutput;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
@@ -26,30 +28,73 @@ static NSInteger toolBarHeight = 60;
 @property (strong, nonatomic) IBOutlet UITapGestureRecognizer *tapGesture;
 @property (strong, nonatomic) IBOutlet UILongPressGestureRecognizer *longPressGesture;
 
+//take photo
+@property (weak, nonatomic) IBOutlet UIView *takePhotoVideoBtn;
+
+
+
+
 
 @end
 
 @implementation StillAndVideoViewController
 
+
+#pragma mark - lifeCycle
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    //hide nav bar
     self.navigationController.navigationBarHidden = YES;
-    self.view.backgroundColor = [UIColor whiteColor];
     
+    //set the taking photo btn content
+    _takePhotoVideoBtn.layer.contents = (id)[UIImage imageNamed:@"takePhoto"].CGImage;
+    
+    //configure gesture
     [_tapGesture requireGestureRecognizerToFail:_longPressGesture];
     
-    [self configureCamera];
+    //create session
+    self.captureSession = [[AVCaptureSession alloc] init];
+    
+    //configure preview layer
+    AVCaptureVideoPreviewLayer *tempLayer = [AVCaptureVideoPreviewLayer layerWithSession:_captureSession];
+    tempLayer.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - toolBarHeight);
+    tempLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    _previewLayer = tempLayer;
+    [self.view.layer insertSublayer:tempLayer atIndex:0];
+    
+    //session queue
+    self.sessionQueue = dispatch_queue_create("sessionQueue", DISPATCH_QUEUE_SERIAL);
+    
+    dispatch_async(self.sessionQueue, ^{
+        [self configureCamera];
+    });
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    
+    dispatch_async(self.sessionQueue, ^{
+        //start session
+        [_captureSession startRunning];
+    });
+}
+
+- (void)viewWillDisappear:(BOOL)animated{
+    dispatch_async(self.sessionQueue, ^{
+        //stop session
+        [_captureSession stopRunning];
+    });
+    
+    [super viewWillDisappear:animated];
 }
 
 - (void)configureCamera{
     //defaut video device
     AVCaptureDevice *tempVideoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    _audioDevice = tempVideoDevice;
     
     //default audio device
     AVCaptureDevice *tempAudioDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
-    _videoDevice = tempAudioDevice;
     
     //video device input
     NSError *error;
@@ -58,14 +103,13 @@ static NSInteger toolBarHeight = 60;
         NSLog(@"init video device input fail.");
         return;
     }
-    _videoInput = tempVideoInput;
     
     //audio device input
     AVCaptureDeviceInput *tempAudioInput = [AVCaptureDeviceInput deviceInputWithDevice:tempAudioDevice error:&error];
     if (error) {
         NSLog(@"init audio device input fail.");
+        return;
     }
-    _audioInput = tempAudioInput;
     
     //image output
     AVCaptureStillImageOutput *tempStillImageOutput = [[AVCaptureStillImageOutput alloc] init];
@@ -76,34 +120,21 @@ static NSInteger toolBarHeight = 60;
     _videoOutput = tempVideoOutput;
     
     //session
-    AVCaptureSession *tempSession = [[AVCaptureSession alloc] init];
-    if ([tempSession canAddInput:tempAudioInput]) {
-        [tempSession addInput:tempAudioInput];
+    if ([_captureSession canAddInput:tempAudioInput]) {
+        [_captureSession addInput:tempAudioInput];
     }
     
-    if ([tempSession canAddInput:tempVideoInput]) {
-        [tempSession addInput:tempVideoInput];
+    if ([_captureSession canAddInput:tempVideoInput]) {
+        [_captureSession addInput:tempVideoInput];
     }
     
-    if ([tempSession canAddOutput:tempStillImageOutput]) {
-        [tempSession addOutput:tempStillImageOutput];
+    if ([_captureSession canAddOutput:tempStillImageOutput]) {
+        [_captureSession addOutput:tempStillImageOutput];
     }
     
-    if ([tempSession canAddOutput:tempVideoOutput]) {
-        [tempSession addOutput:tempVideoOutput];
+    if ([_captureSession canAddOutput:tempVideoOutput]) {
+        [_captureSession addOutput:tempVideoOutput];
     }
-    
-    _captureSession = tempSession;
-    
-    //preview layer
-    AVCaptureVideoPreviewLayer *tempLayer = [AVCaptureVideoPreviewLayer layerWithSession:tempSession];
-    tempLayer.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - toolBarHeight);
-    tempLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-    _previewLayer = tempLayer;
-    [self.view.layer insertSublayer:tempLayer atIndex:0];
-    
-    //start session
-    [tempSession startRunning];
 }
 
 #pragma mark - event methods

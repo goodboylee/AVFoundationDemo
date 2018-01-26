@@ -14,6 +14,7 @@
 		AD0EC88020171DBD00632129 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0EC87F20171DBD00632129 /* main.m */; };
 		AD0EC88820171E2900632129 /* MainTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0EC88720171E2900632129 /* MainTableViewController.m */; };
 		AD0EC88C201720C000632129 /* StillAndVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0EC88B201720C000632129 /* StillAndVideoViewController.m */; };
+		AD5E1FAC201B2CB200D334E5 /* CameraPreview.m in Sources */ = {isa = PBXBuildFile; fileRef = AD5E1FAB201B2CB200D334E5 /* CameraPreview.m */; };
 		ADF6F3D62018265D004BE2ED /* LTSAssetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ADF6F3D52018265D004BE2ED /* LTSAssetManager.m */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +32,8 @@
 		AD0EC88A201720C000632129 /* StillAndVideoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StillAndVideoViewController.h; sourceTree = "<group>"; };
 		AD0EC88B201720C000632129 /* StillAndVideoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StillAndVideoViewController.m; sourceTree = "<group>"; };
 		AD0EC88E2017221700632129 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		AD5E1FAA201B2CB200D334E5 /* CameraPreview.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraPreview.h; sourceTree = "<group>"; };
+		AD5E1FAB201B2CB200D334E5 /* CameraPreview.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CameraPreview.m; sourceTree = "<group>"; };
 		ADF6F3D42018265D004BE2ED /* LTSAssetManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LTSAssetManager.h; sourceTree = "<group>"; };
 		ADF6F3D52018265D004BE2ED /* LTSAssetManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LTSAssetManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -84,6 +87,8 @@
 		AD0EC8892017201C00632129 /* still and video media capture */ = {
 			isa = PBXGroup;
 			children = (
+				AD5E1FAA201B2CB200D334E5 /* CameraPreview.h */,
+				AD5E1FAB201B2CB200D334E5 /* CameraPreview.m */,
 				AD0EC88A201720C000632129 /* StillAndVideoViewController.h */,
 				AD0EC88B201720C000632129 /* StillAndVideoViewController.m */,
 			);
@@ -171,6 +176,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AD0EC88020171DBD00632129 /* main.m in Sources */,
+				AD5E1FAC201B2CB200D334E5 /* CameraPreview.m in Sources */,
 				AD0EC88C201720C000632129 /* StillAndVideoViewController.m in Sources */,
 				ADF6F3D62018265D004BE2ED /* LTSAssetManager.m in Sources */,
 				AD0EC87220171DBD00632129 /* AppDelegate.m in Sources */,
