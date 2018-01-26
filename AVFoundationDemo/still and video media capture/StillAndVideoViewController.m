@@ -142,31 +142,36 @@ static NSInteger toolBarHeight = 60;
 - (IBAction)takePicture:(UITapGestureRecognizer *)sender {
     
     if (sender.state == UIGestureRecognizerStateEnded) {
-        [_captureSession beginConfiguration];
-        _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
-        [_captureSession commitConfiguration];
         
-        if (![_imageOutput isCapturingStillImage]) {
-            AVCaptureConnection *connection = [_imageOutput connectionWithMediaType:AVMediaTypeVideo];
+        dispatch_async(self.sessionQueue, ^{
+            [_captureSession beginConfiguration];
+            _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+            [_captureSession commitConfiguration];
             
-            [_imageOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef  _Nullable imageDataSampleBuffer, NSError * _Nullable error) {
-                if (error == nil) {
-                    NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-                    if (imageData) {
-                        UIImage *image = [UIImage imageWithData:imageData];
-                        [LTSAsset saveImage:image toAlbum:@"我的" completeHandler:^(BOOL reslut) {
-                            if (reslut) {
-                                NSLog(@"save image success.");
-                            }else{
-                                NSLog(@"save image fail.");
-                            }
-                        }];
-                    }else{
-                        NSLog(@"the image data is nil");
+            if (![_imageOutput isCapturingStillImage]) {
+                AVCaptureConnection *connection = [_imageOutput connectionWithMediaType:AVMediaTypeVideo];
+                
+                [_imageOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef  _Nullable imageDataSampleBuffer, NSError * _Nullable error) {
+                    if (error == nil) {
+                        NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+                        if (imageData) {
+                            UIImage *image = [UIImage imageWithData:imageData];
+                            [LTSAsset saveImage:image toAlbum:@"我的" completeHandler:^(BOOL reslut) {
+                                if (reslut) {
+                                    NSLog(@"save image success.");
+                                }else{
+                                    NSLog(@"save image fail.");
+                                }
+                            }];
+                        }else{
+                            NSLog(@"the image data is nil");
+                        }
                     }
-                }
-            }];
-        }
+                }];
+            }
+            
+        });
+        
         
         
     }
@@ -174,22 +179,25 @@ static NSInteger toolBarHeight = 60;
 }
 - (IBAction)takeVideo:(UILongPressGestureRecognizer *)sender {
     
-    if (sender.state == UIGestureRecognizerStateBegan) {
-        [_captureSession beginConfiguration];
-        _captureSession.sessionPreset = AVCaptureSessionPreset640x480;
-        [_captureSession commitConfiguration];
-        
-        NSString *path = [self videoPath];
-        NSLog(@"video path : %@", path);
-        NSURL *videoURL = [NSURL fileURLWithPath:path];
-        
-        if ([_videoOutput isRecording]) {
+    dispatch_async(self.sessionQueue, ^{
+        if (sender.state == UIGestureRecognizerStateBegan) {
+            [_captureSession beginConfiguration];
+            _captureSession.sessionPreset = AVCaptureSessionPreset640x480;
+            [_captureSession commitConfiguration];
+            
+            NSString *path = [self videoPath];
+            NSLog(@"video path : %@", path);
+            NSURL *videoURL = [NSURL fileURLWithPath:path];
+            
+            if ([_videoOutput isRecording]) {
+                [_videoOutput stopRecording];
+            }
+            [_videoOutput startRecordingToOutputFileURL:videoURL recordingDelegate:self];
+        }else if (sender.state == UIGestureRecognizerStateEnded){
             [_videoOutput stopRecording];
         }
-        [_videoOutput startRecordingToOutputFileURL:videoURL recordingDelegate:self];
-    }else if (sender.state == UIGestureRecognizerStateEnded){
-        [_videoOutput stopRecording];
-    }
+    });
+    
     
 }
 
