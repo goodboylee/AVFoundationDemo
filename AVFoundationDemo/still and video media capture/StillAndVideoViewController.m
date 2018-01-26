@@ -120,6 +120,7 @@ static NSInteger toolBarHeight = 60;
     _videoOutput = tempVideoOutput;
     
     //session
+    _captureSession.sessionPreset = AVCaptureSessionPresetHigh;
     if ([_captureSession canAddInput:tempAudioInput]) {
         [_captureSession addInput:tempAudioInput];
     }
@@ -182,7 +183,7 @@ static NSInteger toolBarHeight = 60;
     dispatch_async(self.sessionQueue, ^{
         if (sender.state == UIGestureRecognizerStateBegan) {
             [_captureSession beginConfiguration];
-            _captureSession.sessionPreset = AVCaptureSessionPreset640x480;
+            _captureSession.sessionPreset = AVCaptureSessionPresetHigh;
             [_captureSession commitConfiguration];
             
             NSString *path = [self videoPath];
